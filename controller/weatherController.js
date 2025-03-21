@@ -11,7 +11,7 @@ const API_KEY = process.env.WEATHER_API;
     exports.getWeather = async (req, res) => {
       try {
         const { city } = req.query;
-        const units = "metric"; // Default to Celsius
+        const units = "metric"; 
         const info = { q: city, appid: API_KEY, units };
     
         if (!city) {
@@ -19,23 +19,21 @@ const API_KEY = process.env.WEATHER_API;
         }
 
         console.log(API_KEY);
-        // console.log(response);
-        // Fetch weather data from OpenWeatherMap
-        // const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, { params: info });
         const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);    
         // const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, { params: info });
+        // console.log(response);
 
+        const { name, main, weather, wind, sys } = response.data;
 
-
-        const { name, main, weather, wind } = response.data;
-    
-        // Prepare data for saving
-        const weatherData = {
-          cityName: name,
-          temperature: main.temp,
-          condition: weather[0].description,
-          wind_speed: wind.speed,
-        };
+       
+    const weatherData = {
+        cityName: `${name}, ${sys?.country}`,
+        temperature: main.temp,
+        condition: weather[0].description,
+        wind_speed: wind.speed,
+        humidity: main.humidity,
+      };
+      
     
         // Save to database
         const newWeather = new weatherModel(weatherData);
@@ -44,10 +42,11 @@ const API_KEY = process.env.WEATHER_API;
         return res.status(200).json({
           message: "Weather data fetched successfully",
           data: {
-            city: name,
-            temperature: main.temp,
-            condition: weather[0].description,
-            wind_speed: wind.speed,
+            city: weatherData.cityName,
+            temperature: weatherData.temperature,
+            condition: weatherData.condition,
+            wind_speed: weatherData.wind_speed,
+            humidity: weatherData.humidity,
           },
         });
       } catch (error) {
@@ -57,5 +56,20 @@ const API_KEY = process.env.WEATHER_API;
         });
       }
     };
+
+    exports.getWeatherData = async (req, res) => {
+      try {
+        const weatherData = await weatherModel.find();
+        return res.status(200).json({
+          message: "Weather data fetched successfully",
+          data: weatherData,
+        });
+      } catch (error) {
+        console.error("Error fetching weather data:", error.message);
+        return res.status(500).json({
+          message: "Failed to fetch weather data",
+        });
+      }
+    };  
     
   

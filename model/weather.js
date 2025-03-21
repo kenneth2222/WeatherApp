@@ -20,6 +20,10 @@ const weatherSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    humidity: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );
