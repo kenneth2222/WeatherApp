@@ -5,9 +5,6 @@ const API_KEY = process.env.WEATHER_API;
 
 
 
-
-
-
     exports.getWeather = async (req, res) => {
       try {
         const { city } = req.query;
@@ -18,11 +15,9 @@ const API_KEY = process.env.WEATHER_API;
           return res.status(400).json({ error: "City name is required" });
         }
 
-        console.log(API_KEY);
+        // console.log(API_KEY);
         const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`);    
-        // const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, { params: info });
-        // console.log(response);
-
+   
         const { name, main, weather, wind, sys } = response.data;
 
        
